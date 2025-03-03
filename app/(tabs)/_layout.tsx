@@ -29,15 +29,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: '主张',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="square.and.pencil" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="rules"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '规定',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="decisions"
+        options={{
+          title: '决定',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="checkmark.circle" color={color} />,
         }}
       />
     </Tabs>

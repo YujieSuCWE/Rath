@@ -5,8 +5,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import '../global.css';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
