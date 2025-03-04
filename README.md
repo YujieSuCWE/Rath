@@ -1,6 +1,6 @@
-# Welcome to your Expo app 👋
+# Welcome to Rath! 
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a decision-maker that helps better manage your life! 
 
 ## Get started
 

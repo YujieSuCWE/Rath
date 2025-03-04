@@ -1,5 +1,5 @@
-import * as SQLite from 'expo-sqlite';
+// import * as SQLite from 'expo-sqlite';
 
-const db = await SQLite.openDatabaseAsync('database.db');
+// const db = async () => await SQLite.openDatabaseAsync('database.db');
 
-export default db;
+// export default db;
