@@ -1,13 +1,13 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-export interface Weight {
+export interface personWeight {
     id: number;
     name: string;
     weight: number;
   }
 
 export const getPersonWeights = async (db: SQLiteDatabase) => {
-  const allRows: Weight[] = await db.getAllAsync('SELECT * FROM personweights');
+  const allRows: personWeight[] = await db.getAllAsync('SELECT * FROM personweights');
   return allRows; 
 };
 

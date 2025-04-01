@@ -10,7 +10,6 @@ import 'react-native-gesture-handler';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import '../global.css';
 import { SQLiteDatabase, SQLiteProvider } from 'expo-sqlite';
-import rules from './(tabs)/rules';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -75,7 +74,7 @@ export default function RootLayout() {
               UNION ALL
               SELECT '符合规划', 0.25
               UNION ALL
-              SELECT '财务', 0.2
+              SELECT '经济承担', 0.2
               UNION ALL
               SELECT '时间管理', 0.2
               UNION ALL
@@ -119,6 +118,7 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="index_add" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

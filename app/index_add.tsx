@@ -8,7 +8,7 @@ import { addRule, getRules, Rule } from '@/database/rulesQueries';
 import { useSQLiteContext } from 'expo-sqlite';
 
 
-const rules = () => {
+const index_add = () => {
   const db = useSQLiteContext();
   const [rules, setRules] = useState<Rule[]>([]);
 
@@ -27,14 +27,10 @@ const rules = () => {
     <Animated.ScrollView>
       <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">{'\n\n'}规定</ThemedText>
+          <ThemedText type="title">{'\n\n'}新的主张</ThemedText>
         </ThemedView>
         <ThemedView style={styles.stepContainer}>
-          <ThemedView>
-            {rules.map(item => (
-              <ThemedText key={item.id}>{'\u2022'}{item.content}</ThemedText>
-            ))}
-          </ThemedView>
+
         </ThemedView>
       </MotiView>
     </Animated.ScrollView>
@@ -52,8 +48,6 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
-    paddingLeft: 20, 
-    paddingRight: 20,
     marginBottom: 8,
   },
   reactLogo: {
@@ -65,4 +59,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default rules
+export default index_add
