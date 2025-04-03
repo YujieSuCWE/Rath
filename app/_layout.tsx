@@ -6,10 +6,11 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import 'react-native-gesture-handler';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import '../global.css';
 import { SQLiteDatabase, SQLiteProvider } from 'expo-sqlite';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,7 +34,7 @@ export default function RootLayout() {
   const createDbIfNeeded = async (db: SQLiteDatabase) => {
     await db.withTransactionAsync(async () => {
       await db.execAsync(
-          `CREATE TABLE IF NOT EXISTS rules (
+        `CREATE TABLE IF NOT EXISTS rules (
               id INTEGER PRIMARY KEY NOT NULL,
               category TEXT NOT NULL,
               content TEXT NOT NULL,
@@ -51,7 +52,7 @@ export default function RootLayout() {
               WHERE NOT EXISTS (SELECT 1 FROM rules);`);
 
       await db.execAsync(
-          `CREATE TABLE IF NOT EXISTS decisions (
+        `CREATE TABLE IF NOT EXISTS decisions (
               id INTEGER PRIMARY KEY NOT NULL,
               title TEXT NOT NULL,
               content TEXT NOT NULL,
@@ -64,7 +65,7 @@ export default function RootLayout() {
               WHERE NOT EXISTS (SELECT 1 FROM decisions);`);
 
       await db.execAsync(
-          `CREATE TABLE IF NOT EXISTS personweights (
+        `CREATE TABLE IF NOT EXISTS personweights (
               id INTEGER PRIMARY KEY NOT NULL,
               name TEXT NOT NULL,
               weight FLOAT NOT NULL
@@ -83,7 +84,7 @@ export default function RootLayout() {
               WHERE NOT EXISTS (SELECT 1 FROM personweights);`);
 
       await db.execAsync(
-          `CREATE TABLE IF NOT EXISTS groupweights (
+        `CREATE TABLE IF NOT EXISTS groupweights (
               id INTEGER PRIMARY KEY NOT NULL,
               name TEXT NOT NULL,
               weight FLOAT NOT NULL
@@ -98,7 +99,7 @@ export default function RootLayout() {
               WHERE NOT EXISTS (SELECT 1 FROM groupweights);`);
 
       await db.execAsync(
-          `CREATE TABLE IF NOT EXISTS socialweights (
+        `CREATE TABLE IF NOT EXISTS socialweights (
               id INTEGER PRIMARY KEY NOT NULL,
               name TEXT NOT NULL,
               weight FLOAT NOT NULL
@@ -111,18 +112,21 @@ export default function RootLayout() {
               SELECT '促进参与', 0.3
               ) AS temp
               WHERE NOT EXISTS (SELECT 1 FROM socialweights);`);
-  });
+    });
   }
   return (
     <SQLiteProvider databaseName='database.db' onInit={createDbIfNeeded}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="index_add" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <GestureHandlerRootView>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <BottomSheetModalProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </BottomSheetModalProvider>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </GestureHandlerRootView>
     </SQLiteProvider>
   );
 }

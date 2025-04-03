@@ -1,11 +1,11 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, FlatList, SafeAreaView } from 'react-native'
 import React, { Component, useState, useEffect } from 'react'
 import { MotiView, MotiText } from 'moti';
-import Animated from 'react-native-reanimated';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { addRule, getRules, Rule } from '@/database/rulesQueries';
 import { useSQLiteContext } from 'expo-sqlite';
+import { FlashList } from '@shopify/flash-list';
 
 
 const rules = () => {
@@ -24,20 +24,18 @@ const rules = () => {
   }
 
   return (
-    <Animated.ScrollView>
+    <SafeAreaView>
       <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">{'\n\n'}规定</ThemedText>
-        </ThemedView>
+        <ThemedText type="title" style={styles.titleContainer}>{'规定'}</ThemedText>
         <ThemedView style={styles.stepContainer}>
-          <ThemedView>
-            {rules.map(item => (
-              <ThemedText key={item.id}>{'\u2022'}{item.content}</ThemedText>
-            ))}
-          </ThemedView>
+          <FlashList
+            renderItem={({ item }) => <ThemedText style={styles.content}>{'\n\u2022 ' + item.content}</ThemedText>}
+            data={rules}
+            estimatedItemSize={20}
+          />
         </ThemedView>
       </MotiView>
-    </Animated.ScrollView>
+    </SafeAreaView>
 
   );
 
@@ -52,17 +50,14 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
-    paddingLeft: 20, 
+    paddingLeft: 20,
     paddingRight: 20,
     marginBottom: 8,
+    height: '100%'
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  content: {
+    fontSize: 18
+  }
 });
 
 export default rules

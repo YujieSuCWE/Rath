@@ -1,12 +1,11 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import React, { Component, useState, useEffect } from 'react'
-import { MotiView, MotiText } from 'moti';
-import Animated from 'react-native-reanimated';
+import { MotiView, MotiText, SafeAreaView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import '@/database/decisionsQueries';
-import { addDecision, getDecisions, Decision } from '@/database/decisionsQueries';
+import { getDecisions, Decision } from '@/database/decisionsQueries';
 import { useSQLiteContext } from 'expo-sqlite';
+import { FlashList } from '@shopify/flash-list';
 
 
 const decisions = () => {
@@ -18,21 +17,23 @@ const decisions = () => {
   }, [db])
 
   return (
-    <Animated.ScrollView>
+    <SafeAreaView>
       <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">{'\n\n'}决定</ThemedText>
-        </ThemedView>
+        <ThemedText type="title" style={styles.titleContainer}>{'决定'}</ThemedText>
         <ThemedView style={styles.stepContainer}>
-          <ThemedView>
-            {decisions.map(item => (
-              <ThemedText key={item.id}>{'\u2022'}{item.title}{'\n'}{item.content}{'\n'}</ThemedText>
-            ))}
-          </ThemedView>
+          <FlashList
+            renderItem={({ item }) =>
+              <View>
+                <ThemedText style={styles.contentTitle}>{'\n\u2022 ' + item.title}</ThemedText>
+                <ThemedText style={styles.content}>{item.content}</ThemedText>
+              </View>
+            }
+            data={decisions}
+            estimatedItemSize={20}
+          />
         </ThemedView>
       </MotiView>
-    </Animated.ScrollView>
-
+    </SafeAreaView>
   );
 
 }
@@ -50,14 +51,15 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     marginBottom: 8,
+    height: '100%'
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  contentTitle: {
+    fontSize: 18
   },
+  content: {
+    fontSize: 16, 
+    paddingLeft: 20,
+  }
 });
 
 export default decisions

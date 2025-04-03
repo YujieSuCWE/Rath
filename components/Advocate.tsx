@@ -6,9 +6,10 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { addRule, getRules, Rule } from '@/database/rulesQueries';
 import { useSQLiteContext } from 'expo-sqlite';
+import { FlashList } from '@shopify/flash-list';
 
 
-const index_add = () => {
+const advocate = () => {
   const db = useSQLiteContext();
   const [rules, setRules] = useState<Rule[]>([]);
 
@@ -24,16 +25,16 @@ const index_add = () => {
   }
 
   return (
-    <Animated.ScrollView>
-      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">{'\n\n'}新的主张</ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.stepContainer}>
+    // <Animated.ScrollView>
+    <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title" style={{ fontSize: 30 }}>{'新的主张'}</ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
 
-        </ThemedView>
-      </MotiView>
-    </Animated.ScrollView>
+      </ThemedView>
+    </MotiView>
+    /* </Animated.ScrollView> */
 
   );
 
@@ -50,13 +51,6 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
 });
 
-export default index_add
+export default advocate

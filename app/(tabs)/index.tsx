@@ -1,17 +1,16 @@
-import { Image, StyleSheet, Platform, Pressable, TouchableOpacity } from 'react-native';
-import React, { Component, useState, useEffect } from 'react'
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { Image, StyleSheet, Platform, Pressable, View, Text } from 'react-native';
+import React, { Component, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { MotiView, MotiText } from 'moti';
-import { addRule, getRules, Rule } from '@/database/rulesQueries';
-import { addDecision, getDecisions, Decision } from '@/database/decisionsQueries';
-import { addPersonWeight, getPersonWeights, personWeight } from '@/database/personWeightsQueries';
-import { addGroupWeight, getGroupWeights, groupWeight } from '@/database/groupWeightsQueries';
-import { addSocialWeight, getSocialWeights, socialWeight } from '@/database/socialWeightsQueries';
+import { MotiView, MotiText, SafeAreaView } from 'moti';
+// import { addRule, getRules, Rule } from '@/database/rulesQueries';
+// import { addDecision, getDecisions, Decision } from '@/database/decisionsQueries';
+import { getPersonWeights, personWeight } from '@/database/personWeightsQueries';
+import { getGroupWeights, groupWeight } from '@/database/groupWeightsQueries';
+import { getSocialWeights, socialWeight } from '@/database/socialWeightsQueries';
 import { useSQLiteContext } from 'expo-sqlite';
-import { router, Link } from 'expo-router';
-import { blue } from 'react-native-reanimated/lib/typescript/Colors';
+import { BottomSheetView, BottomSheetModal } from '@gorhom/bottom-sheet';
+import Advocate from '@/components/Advocate';
 
 const HomeScreen = () => {
   const db = useSQLiteContext();
@@ -30,54 +29,78 @@ const HomeScreen = () => {
     getSocialWeights(db).then(setSocialWeights).catch(console.error)
   }, [db])
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+  const [isOpen, setIsOpen] = useState(false);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+    setIsOpen(true);
+  }, []);
+  const [canPanDownClose, setCanPanDownClose] = useState(false);
+  const snapPoints = ["20%", "60%", "90%"];
 
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">主张</ThemedText>
+    <SafeAreaView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
+      <MotiView
+        animate={{ opacity: isOpen ? 1 : 0 }}
+        transition={{ type: 'timing' }}
+        style={styles.overlay}
+      />
+
+      <ThemedText type="title" style={styles.titleContainer}>{'主张'}</ThemedText>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">{'\n个人'}</ThemedText>
+        <ThemedView>
+          {personWeights.map(item => (
+            <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
+          ))}
         </ThemedView>
-        <ThemedView style={styles.stepContainer}>
-          <ThemedView>
-            <ThemedText type="subtitle">个人</ThemedText>
-            <ThemedView>
-              {personWeights.map(item => (
-                <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
-              ))}
-            </ThemedView>
-          </ThemedView>
-          <ThemedView>
-            <ThemedText type="subtitle">家庭与社区</ThemedText>
-            <ThemedView>
-              {groupWeights.map(item => (
-                <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
-              ))}
-            </ThemedView>
-          </ThemedView>
-          <ThemedView>
-            <ThemedText type="subtitle">人际</ThemedText>
-            <ThemedView>
-              {socialWeights.map(item => (
-                <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
-              ))}
-            </ThemedView>
-          </ThemedView>
+        <ThemedText type="subtitle">{'\n家庭与社区'}</ThemedText>
+        <ThemedView>
+          {groupWeights.map(item => (
+            <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
+          ))}
         </ThemedView>
-        <Pressable onPress={() => {
-          router.push(`/index_add`)
+        <ThemedText type="subtitle">{'\n人际'}</ThemedText>
+        <ThemedView>
+          {socialWeights.map(item => (
+            <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
+          ))}
+        </ThemedView>
+        <Pressable onPress={handlePresentModalPress} style={{
+          position: 'absolute',
+          left: '95%',
+          top: '73%',
+          height: 30
         }}>
-          <ThemedText style={{ fontSize: 24, textAlign: 'center', color: 'blue' }}>{'+'}</ThemedText>
+          <Text style={{ fontSize: 48, color: 'green', lineHeight: 42 }}>{'+'}</Text>
         </Pressable>
-      </MotiView>
-    </ParallaxScrollView>
+      </ThemedView>
+      <BottomSheetModal
+        index={1}
+        ref={bottomSheetModalRef}
+        enableDynamicSizing={false}
+        snapPoints={snapPoints}
+        onChange={(index: number) => {
+          handleSheetChanges(index);
+          setIsOpen(index !== -1);
+          setCanPanDownClose(index === 0);
+        }}
+        enablePanDownToClose={canPanDownClose}
+        onAnimate={(fromIndex, toIndex) => {
+          if (toIndex === -1) {
+            setIsOpen(false);
+          }
+        }}
+      >
+        <BottomSheetView>
+          <Advocate />
+        </BottomSheetView>
+      </BottomSheetModal>
+    </SafeAreaView>
   );
 }
 
@@ -86,18 +109,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingBottom: 10,
+    padding: 10,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 1,
   },
   stepContainer: {
-    gap: 15,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    gap: 8,
+    paddingLeft: 20,
+    paddingRight: 20,
+    height: '100%'
   },
 });
 
