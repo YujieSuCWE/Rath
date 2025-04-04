@@ -7,9 +7,18 @@ import { ThemedView } from '@/components/ThemedView';
 import { addRule, getRules, Rule } from '@/database/rulesQueries';
 import { useSQLiteContext } from 'expo-sqlite';
 import { FlashList } from '@shopify/flash-list';
+import TabButtons, { TabButtonType } from './TabButtons';
 
+export enum CustomTab {
+  newRule,
+  newDecision
+}
 
 const advocate = () => {
+  const [selectedTab, setSelectedTab] = useState<CustomTab>(CustomTab.newRule);
+
+  const buttons: TabButtonType[] = [{ title: "规则" }, { title: "决定" }];
+
   const db = useSQLiteContext();
   const [rules, setRules] = useState<Rule[]>([]);
 
@@ -30,6 +39,11 @@ const advocate = () => {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title" style={{ fontSize: 30 }}>{'新的主张'}</ThemedText>
       </ThemedView>
+      <TabButtons
+        buttons={buttons}
+        selectedTab={selectedTab}
+        setSelectedTab={setSelectedTab}
+      />
       <ThemedView style={styles.stepContainer}>
 
       </ThemedView>
@@ -46,6 +60,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     padding: 10,
+    marginBottom: 10,
+    fontSize: 30,
   },
   stepContainer: {
     gap: 8,

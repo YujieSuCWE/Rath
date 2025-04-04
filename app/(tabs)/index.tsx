@@ -10,7 +10,7 @@ import { getGroupWeights, groupWeight } from '@/database/groupWeightsQueries';
 import { getSocialWeights, socialWeight } from '@/database/socialWeightsQueries';
 import { useSQLiteContext } from 'expo-sqlite';
 import { BottomSheetView, BottomSheetModal } from '@gorhom/bottom-sheet';
-import Advocate from '@/components/Advocate';
+import Advocate from '@/components/advocate/advocate';
 
 const HomeScreen = () => {
   const db = useSQLiteContext();
@@ -96,7 +96,7 @@ const HomeScreen = () => {
           }
         }}
       >
-        <BottomSheetView>
+        <BottomSheetView style={styles.container}>
           <Advocate />
         </BottomSheetView>
       </BottomSheetModal>
@@ -121,6 +121,9 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     height: '100%'
+  },
+  container: {
+    paddingHorizontal: 10,
   },
 });
 
