@@ -1,26 +1,35 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { Component, useState, useEffect } from 'react'
 import { MotiView, MotiText, SafeAreaView } from 'moti';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { getDecisions, Decision } from '@/database/decisionsQueries';
+import { getDecisions, addDecision, Decision } from '@/database/decisionsQueries';
 import { useSQLiteContext } from 'expo-sqlite';
 import { FlashList } from '@shopify/flash-list';
+import { eventBus } from '@/components/advocate/eventBus';
 
 
 const decisions = () => {
   const db = useSQLiteContext();
   const [decisions, setDecisions] = useState<Decision[]>([]);
 
+  getDecisions(db).then(setDecisions).catch(console.error)
+
   useEffect(() => {
-    getDecisions(db).then(setDecisions).catch(console.error)
-  }, [db])
+      const handleDbChange = () => {
+        getDecisions(db).then(setDecisions).catch(console.error);
+      };
+      eventBus.on('dbDecisionsChange', handleDbChange);
+      return () => {
+        eventBus.off('dbDecisionsChange', handleDbChange);
+      };
+    }, [db]);
 
   return (
     <SafeAreaView>
       <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
         <ThemedText type="title" style={styles.titleContainer}>{'决定'}</ThemedText>
-        <ThemedView style={styles.stepContainer}>
+        <ScrollView style={styles.stepContainer}>
           <FlashList
             renderItem={({ item }) =>
               <View>
@@ -31,7 +40,8 @@ const decisions = () => {
             data={decisions}
             estimatedItemSize={20}
           />
-        </ThemedView>
+          <View style={{ marginBottom: 200 }}></View>
+        </ScrollView>
       </MotiView>
     </SafeAreaView>
   );
@@ -50,14 +60,15 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingLeft: 20,
     paddingRight: 20,
-    marginBottom: 8,
-    height: '100%'
+    marginBottom: 80,
+    height: '100%',
+    backgroundColor: 'white',
   },
   contentTitle: {
     fontSize: 18
   },
   content: {
-    fontSize: 16, 
+    fontSize: 16,
     paddingLeft: 20,
   }
 });

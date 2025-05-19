@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, Pressable, View, Text } from 'react-native';
+import { Image, StyleSheet, Platform, Pressable, View, Text, Dimensions } from 'react-native';
 import React, { Component, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -11,6 +11,7 @@ import { getSocialWeights, socialWeight } from '@/database/socialWeightsQueries'
 import { useSQLiteContext } from 'expo-sqlite';
 import { BottomSheetView, BottomSheetModal } from '@gorhom/bottom-sheet';
 import Advocate from '@/components/advocate/advocate';
+import { eventBus } from '@/components/advocate/eventBus';
 
 const HomeScreen = () => {
   const db = useSQLiteContext();
@@ -33,6 +34,17 @@ const HomeScreen = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
+
+  useEffect(() => {
+    const handleEvent = () => {
+      bottomSheetModalRef.current?.dismiss();
+    };
+    eventBus.on('changeSheet', handleEvent);
+    return () => {
+      eventBus.off('changeSheet', handleEvent);
+    };
+  }, []);
+
   const [isOpen, setIsOpen] = useState(false);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -72,11 +84,25 @@ const HomeScreen = () => {
         </ThemedView>
         <Pressable onPress={handlePresentModalPress} style={{
           position: 'absolute',
-          left: '95%',
-          top: '73%',
-          height: 30
+          left: Dimensions.get('window').width / 2 - 30,
+          top: '70%',
+          width: 60,
+          height: 60,
+          backgroundColor: '#fcba03',
+          borderRadius: 30,
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
         }}>
-          <Text style={{ fontSize: 48, color: 'green', lineHeight: 42 }}>{'+'}</Text>
+          <Text style={{
+            fontSize: 45,
+            color: 'white',
+            fontWeight: 'bold',
+            lineHeight: 48,
+          }}>{'+'}</Text>
         </Pressable>
       </ThemedView>
       <BottomSheetModal

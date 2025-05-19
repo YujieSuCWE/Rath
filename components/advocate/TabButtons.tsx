@@ -20,8 +20,9 @@ const TabButtons = ({ buttons, selectedTab, setSelectedTab }: TabButtonsProps) =
                 borderRadius: 14,
                 justifyContent: 'center',
                 width: '60%',
-                height: '27%',
-                alignSelf: 'center'
+                height: 40,
+                alignSelf: 'center', 
+                marginBottom: 15
             }}>
             <MotiView
                 from={{ marginHorizontal: '2%' }}
@@ -33,7 +34,7 @@ const TabButtons = ({ buttons, selectedTab, setSelectedTab }: TabButtonsProps) =
                     borderRadius: 10,
                     marginHorizontal: '2%',
                     height: '75%',
-                    width: '45%'
+                    width: '45%', 
                 }}>
             </MotiView>
             <View style={{ flexDirection: 'row' }}>

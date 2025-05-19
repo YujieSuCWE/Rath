@@ -92,7 +92,7 @@ export default function RootLayout() {
           INSERT INTO groupweights (name, weight) SELECT name, weight FROM (
               SELECT '关系和睦' AS name, 0.35 AS weight
               UNION ALL
-              SELECT '经济支持', 0.3
+              SELECT '经济支持', 0.4
               UNION ALL
               SELECT '共同目标', 0.25
               ) AS temp
