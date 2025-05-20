@@ -12,6 +12,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { BottomSheetView, BottomSheetModal } from '@gorhom/bottom-sheet';
 import Advocate from '@/components/advocate/advocate';
 import { eventBus } from '@/components/advocate/eventBus';
+import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
 
 const HomeScreen = () => {
   const db = useSQLiteContext();
@@ -53,6 +54,10 @@ const HomeScreen = () => {
   const [canPanDownClose, setCanPanDownClose] = useState(false);
   const snapPoints = ["20%", "60%", "90%"];
 
+  const [personPressed, setPersonPress] = useState(false);
+  const [groupPressed, setGroupPress] = useState(false);
+  const [socialPressed, setSocialPress] = useState(false);
+  const [buttonPressed, setButtonPress] = useState(false);
 
   return (
     <SafeAreaView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
@@ -64,42 +69,78 @@ const HomeScreen = () => {
 
       <ThemedText type="title" style={styles.titleContainer}>{'主张'}</ThemedText>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">{'\n个人'}</ThemedText>
-        <ThemedView>
-          {personWeights.map(item => (
-            <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
-          ))}
-        </ThemedView>
-        <ThemedText type="subtitle">{'\n家庭与社区'}</ThemedText>
-        <ThemedView>
-          {groupWeights.map(item => (
-            <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
-          ))}
-        </ThemedView>
-        <ThemedText type="subtitle">{'\n人际'}</ThemedText>
-        <ThemedView>
-          {socialWeights.map(item => (
-            <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
-          ))}
-        </ThemedView>
-        <Pressable onPress={handlePresentModalPress} style={{
-          position: 'absolute',
-          left: Dimensions.get('window').width / 2 - 30,
-          top: '70%',
-          width: 60,
-          height: 60,
-          backgroundColor: '#fcba03',
-          borderRadius: 30,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-        }}>
+        <Pressable
+          onPressIn={() => setPersonPress(true)}
+          onPressOut={() => setPersonPress(false)}
+        >
+          <ThemedText type="subtitle">{'\n个人'}</ThemedText>
+          <ThemedView
+            style={{
+              backgroundColor: personPressed ? '#e0e0e0' : 'transparent',
+              borderRadius: 8,
+              padding: 8,
+            }}>
+            {personWeights.map(item => (
+              <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
+            ))}
+          </ThemedView>
+        </Pressable>
+
+        <Pressable
+          onPressIn={() => setGroupPress(true)}
+          onPressOut={() => setGroupPress(false)}
+        >
+          <ThemedText type="subtitle">{'\n家庭与社区'}</ThemedText>
+          <ThemedView
+            style={{
+              backgroundColor: groupPressed ? '#e0e0e0' : 'transparent',
+              borderRadius: 8,
+              padding: 8,
+            }}>
+            {groupWeights.map(item => (
+              <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
+            ))}
+          </ThemedView>
+        </Pressable>
+
+        <Pressable
+          onPressIn={() => setSocialPress(true)}
+          onPressOut={() => setSocialPress(false)}
+        >
+          <ThemedText type="subtitle">{'\n人际'}</ThemedText>
+          <ThemedView style={{
+            backgroundColor: socialPressed ? '#e0e0e0' : 'transparent',
+            borderRadius: 8,
+            padding: 8,
+          }}>
+            {socialWeights.map(item => (
+              <ThemedText key={item.id}>{'\u2022'}{item.name}{': '}{item.weight * 100}{'%'}</ThemedText>
+            ))}
+          </ThemedView>
+        </Pressable>
+
+        <Pressable
+          onPress={handlePresentModalPress}
+          onPressIn={() => setButtonPress(true)}
+          onPressOut={() => setButtonPress(false)}
+          style={{
+            position: 'absolute',
+            left: Dimensions.get('window').width / 2 - 30,
+            top: '70%',
+            width: 60,
+            height: 60,
+            backgroundColor: buttonPressed ? '#e6aa02' : '#fcba03',
+            borderRadius: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+          }}>
           <Text style={{
             fontSize: 45,
-            color: 'white',
+            color: buttonPressed ? '#e6e6e6' : 'white',
             fontWeight: 'bold',
             lineHeight: 48,
           }}>{'+'}</Text>
@@ -123,7 +164,7 @@ const HomeScreen = () => {
         }}
       >
         <BottomSheetView style={styles.container}>
-          <Advocate />
+          <Advocate index={0} />
         </BottomSheetView>
       </BottomSheetModal>
     </SafeAreaView>

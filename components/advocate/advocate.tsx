@@ -9,16 +9,29 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { FlashList } from '@shopify/flash-list';
 import TabButtons, { TabButtonType } from './TabButtons';
 import New from './New';
+import { Decision } from '@/database/decisionsQueries';
 
 export enum CustomTab {
   newRule,
   newDecision
 }
 
-const advocate = () => {
+enum Titles {
+  "新的主张",
+  "编辑规定",
+  "编辑决定"
+}
+
+type Props = {
+  index: number;
+  ruleItem?: Rule;
+  decisionItem?: Decision;
+};
+
+const advocate = ({ index, ruleItem, decisionItem }: Props) => {
   const [selectedTab, setSelectedTab] = useState<CustomTab>(CustomTab.newRule);
 
-  const buttons: TabButtonType[] = [{ title: "规则" }, { title: "决定" }];
+  const buttons: TabButtonType[] = [{ title: "规定" }, { title: "决定" }];
 
   const db = useSQLiteContext();
   const [rules, setRules] = useState<Rule[]>([]);
@@ -27,27 +40,51 @@ const advocate = () => {
     getRules(db).then(setRules).catch(console.error)
   }, [db])
 
-  return (
-
-    <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={{ fontSize: 30 }}>{'新的主张'}</ThemedText>
-      </ThemedView>
-      <TabButtons
-        buttons={buttons}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-      />
-      <ScrollView>
-        <ThemedView style={styles.stepContainer}>
-          <New selectedTab={selectedTab} />
+  if (index === 0) {
+    return (
+      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title" style={{ fontSize: 30 }}>{Titles[index]}</ThemedText>
         </ThemedView>
-      </ScrollView >
-    </MotiView>
-
-
-  );
-
+        <TabButtons
+          buttons={buttons}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+        />
+        <ScrollView>
+          <ThemedView style={styles.stepContainer}>
+            <New selectedTab={selectedTab} />
+          </ThemedView>
+        </ScrollView >
+      </MotiView>
+    );
+  } else if (index === 1) {
+    return (
+      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title" style={{ fontSize: 30 }}>{Titles[index]}</ThemedText>
+        </ThemedView>
+        <ScrollView>
+          <ThemedView style={styles.stepContainer}>
+            <New selectedTab={0} ruleItem={ruleItem} />
+          </ThemedView>
+        </ScrollView >
+      </MotiView>
+    );
+  } else if (index === 2) {
+    return (
+      <MotiView from={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ type: 'timing' }}>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title" style={{ fontSize: 30 }}>{Titles[index]}</ThemedText>
+        </ThemedView>
+        <ScrollView>
+          <ThemedView style={styles.stepContainer}>
+            <New selectedTab={1} decisionItem={decisionItem}/>
+          </ThemedView>
+        </ScrollView >
+      </MotiView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

@@ -31,6 +31,12 @@ export const editRuleCategory = async (db:SQLiteDatabase, category: string, id: 
   return result;
 }
 
+export const editRule = async (db:SQLiteDatabase, category: string, content: string, id: number) => {
+  const result = await db.runAsync('UPDATE rules SET category = ?, content = ? WHERE id = ?', category, content, id);
+  console.log(result.lastInsertRowId, result.changes);
+  return result;
+}
+
 export const deleteRule = async (db:SQLiteDatabase, id: number) => {
   const result = await db.runAsync('DELETE FROM rules WHERE id = ?', id);
   console.log(result.lastInsertRowId, result.changes);

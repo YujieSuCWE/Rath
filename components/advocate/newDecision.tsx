@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '../ThemedView';
 import Checkbox from 'expo-checkbox';
-import { addDecision, getDecisions, Decision } from '@/database/decisionsQueries';
+import { addDecision, editDecision, deleteDecision, Decision } from '@/database/decisionsQueries';
 import { getPersonWeights, personWeight } from '@/database/personWeightsQueries';
 import { getGroupWeights, groupWeight } from '@/database/groupWeightsQueries';
 import { getSocialWeights, socialWeight } from '@/database/socialWeightsQueries';
@@ -11,7 +11,11 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { MotiView } from 'moti';
 import { eventBus } from '@/components/advocate/eventBus';
 
-const newDecision = () => {
+type Props = {
+  item?: Decision
+};
+
+const newDecision = ({ item }: Props) => {
   const db = useSQLiteContext();
   const [personWeights, setPersonWeights] = useState<personWeight[]>([]);
   useEffect(() => {
@@ -26,8 +30,8 @@ const newDecision = () => {
     getSocialWeights(db).then(setSocialWeights).catch(console.error)
   }, [db])
 
-  const [content, onChangeContent] = useState('');
-  const [title, onChangeTitle] = useState('');
+  const [content, onChangeContent] = useState(item?.content ?? '');
+  const [title, onChangeTitle] = useState(item?.title ?? '');
 
   const [personPercentage, onChangePersonPercentage] = useState(0);
   const [groupPercentage, onChangeGroupPercentage] = useState(0);
@@ -44,13 +48,34 @@ const newDecision = () => {
     }
   })
 
-  function addingDecisions(category: string, content: string) {
-    addDecision(db, category, content)
+  function addingDecisions(title: string, content: string) {
+    addDecision(db, title, content)
       .then(result => {
         console.log("A Decision is added successfully:", result);
         eventBus.emit('dbDecisionsChange');
       }).catch(console.error);
   }
+
+  function editingDecisions(title: string, content: string, id: number) {
+    editDecision(db, title, content, id)
+      .then(result => {
+        console.log("A Decision is edited successfully:", result);
+        eventBus.emit('dbDecisionsChange');
+      })
+      .catch(console.error);
+  }
+
+  function deletingDecisions(id: number) {
+    deleteDecision(db, id)
+      .then(result => {
+        console.log("A Decision is deleted successfully:", result);
+        eventBus.emit('dbDecisionsChange');
+      })
+      .catch(console.error);
+  }
+
+  const [buttonPressed, setButtonPress] = useState(false);
+  const [deletePressed, setDeletePress] = useState(false);
 
   return (
     <ThemedView>
@@ -66,6 +91,31 @@ const newDecision = () => {
         value={content}
         placeholder="决定内容"
       />
+      <Pressable
+        style={{
+          marginTop: 10
+        }}
+        onPress={() => {
+          setDeletePress(!deletePressed)
+        }}
+      >
+        <MotiView
+          animate={{ backgroundColor: deletePressed ? '#db0000' : '#fcba03' }}
+          style={{
+            borderRadius: 14,
+            justifyContent: 'center',
+            width: '40%',
+            height: 40,
+            alignSelf: 'center',
+          }}>
+          <ThemedText style={{
+            color: 'white',
+            alignSelf: 'center',
+            fontWeight: 'bold',
+            fontSize: 20
+          }}>{'删除'}</ThemedText>
+        </MotiView>
+      </Pressable>
       <ThemedText type="subtitle" style={{ paddingLeft: 10 }}>{'\n个人'}</ThemedText>
       <ThemedView style={{ paddingLeft: 10 }}>
         {personWeights.map(item => (
@@ -146,15 +196,17 @@ const newDecision = () => {
           marginBottom: 250,
           marginTop: 20
         }}
+        onPressIn={() => setButtonPress(true)}
+        onPressOut={() => setButtonPress(false)}
         onPress={() => {
-          addingDecisions(title, content);
+          item ? (deletePressed ? deletingDecisions(item.id) : editingDecisions(title, content, item.id)) : addingDecisions(title, content)
           eventBus.emit('changeSheet');
         }}
       >
         <MotiView
           animate={{ backgroundColor: isPass ? '#fcba03' : '#ccc' }}
           style={{
-            backgroundColor: isPass ? '#fcba03' : '#ccc',
+            backgroundColor: isPass ? (buttonPressed ? '#e6aa02' : '#fcba03') : '#ccc',
             borderRadius: 14,
             justifyContent: 'center',
             width: '40%',

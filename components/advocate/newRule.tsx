@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '../ThemedView';
 import Checkbox from 'expo-checkbox';
-import { addRule, getRules, Rule } from '@/database/rulesQueries';
+import { addRule, editRule, deleteRule, Rule } from '@/database/rulesQueries';
 import { getPersonWeights, personWeight } from '@/database/personWeightsQueries';
 import { getGroupWeights, groupWeight } from '@/database/groupWeightsQueries';
 import { getSocialWeights, socialWeight } from '@/database/socialWeightsQueries';
@@ -11,7 +11,11 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { MotiView } from 'moti';
 import { eventBus } from '@/components/advocate/eventBus';
 
-const newRule = () => {
+type Props = {
+  item?: Rule
+};
+
+const newRule = ({ item }: Props) => {
   const db = useSQLiteContext();
   const [personWeights, setPersonWeights] = useState<personWeight[]>([]);
   useEffect(() => {
@@ -26,8 +30,8 @@ const newRule = () => {
     getSocialWeights(db).then(setSocialWeights).catch(console.error)
   }, [db])
 
-  const [content, onChangeContent] = useState('');
-  const [category, onChangeCategory] = useState('');
+  const [content, onChangeContent] = useState(item?.content ?? '');
+  const [category, onChangeCategory] = useState(item?.category ?? '');
 
   const [personPercentage, onChangePersonPercentage] = useState(0);
   const [groupPercentage, onChangeGroupPercentage] = useState(0);
@@ -53,6 +57,27 @@ const newRule = () => {
       .catch(console.error);
   }
 
+  function editingRules(category: string, content: string, id: number) {
+    editRule(db, category, content, id)
+      .then(result => {
+        console.log("A Rule is edited successfully:", result);
+        eventBus.emit('dbRulesChange');
+      })
+      .catch(console.error);
+  }
+
+  function deletingRules(id: number) {
+    deleteRule(db, id)
+      .then(result => {
+        console.log("A Rule is deleted successfully:", result);
+        eventBus.emit('dbRulesChange');
+      })
+      .catch(console.error);
+  }
+
+  const [buttonPressed, setButtonPress] = useState(false);
+  const [deletePressed, setDeletePress] = useState(false);
+
   return (
     <ThemedView>
       <TextInput
@@ -67,6 +92,31 @@ const newRule = () => {
         value={content}
         placeholder="规定内容"
       />
+      <Pressable
+        style={{
+          marginTop: 10
+        }}
+        onPress={() => {
+          setDeletePress(!deletePressed)
+        }}
+      >
+        <MotiView
+          animate={{ backgroundColor: deletePressed ? '#db0000' : '#fcba03' }}
+          style={{
+            borderRadius: 14,
+            justifyContent: 'center',
+            width: '40%',
+            height: 40,
+            alignSelf: 'center',
+          }}>
+          <ThemedText style={{
+            color: 'white',
+            alignSelf: 'center',
+            fontWeight: 'bold',
+            fontSize: 20
+          }}>{'删除'}</ThemedText>
+        </MotiView>
+      </Pressable>
       <ThemedText type="subtitle" style={{ paddingLeft: 10 }}>{'\n个人'}</ThemedText>
       <ThemedView style={{ paddingLeft: 10 }}>
         {personWeights.map(item => (
@@ -147,15 +197,17 @@ const newRule = () => {
           marginBottom: 250,
           marginTop: 20
         }}
+        onPressIn={() => setButtonPress(true)}
+        onPressOut={() => setButtonPress(false)}
         onPress={() => {
-          addingRules(category, content);
+          item ? (deletePressed ? deletingRules(item.id) : editingRules(category, content, item.id)) : addingRules(category, content)
           eventBus.emit('changeSheet');
         }}
       >
         <MotiView
           animate={{ backgroundColor: isPass ? '#fcba03' : '#ccc' }}
           style={{
-            backgroundColor: isPass ? '#fcba03' : '#ccc',
+            backgroundColor: isPass ? (buttonPressed ? '#e6aa02' : '#fcba03') : '#ccc',
             borderRadius: 14,
             justifyContent: 'center',
             width: '40%',

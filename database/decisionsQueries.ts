@@ -30,6 +30,12 @@ export const editDecisionContent = async (db:SQLiteDatabase, content: string, id
   return result;
 }
 
+export const editDecision = async (db:SQLiteDatabase, title: string, content: string, id: number) => {
+  const result = await db.runAsync('UPDATE decisions SET title = ?, content = ? WHERE id = ?', title, content, id);
+  console.log(result.lastInsertRowId, result.changes); 
+  return result;
+}
+
 export const deleteDecision = async (db:SQLiteDatabase, id: number) => {
   const result = await db.runAsync('DELETE FROM decisions WHERE id = ?', id);
   console.log(result.lastInsertRowId, result.changes);
